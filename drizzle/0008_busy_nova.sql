@@ -1,0 +1,1 @@
+ALTER TABLE "royaltysplits" DROP COLUMN "is_cited_author";

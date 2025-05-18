@@ -1,6 +1,6 @@
 {
-  "id": "f63fc5f3-015a-4a46-b39d-af43b800d847",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "98a07afa-bab6-44ab-8330-8c5a55027f7f",
+  "prevId": "b8ed4a44-6984-431a-a096-406a0e8921d7",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -52,8 +52,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.royalty_splits": {
-      "name": "royalty_splits",
+    "public.royaltysplits": {
+      "name": "royaltysplits",
       "schema": "",
       "columns": {
         "paper_id": {
@@ -62,9 +62,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
+        "user_name": {
+          "name": "user_name",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
         },
@@ -89,9 +89,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "royalty_splits_paper_id_papers_id_fk": {
-          "name": "royalty_splits_paper_id_papers_id_fk",
-          "tableFrom": "royalty_splits",
+        "royaltysplits_paper_id_papers_id_fk": {
+          "name": "royaltysplits_paper_id_papers_id_fk",
+          "tableFrom": "royaltysplits",
           "tableTo": "papers",
           "columnsFrom": [
             "paper_id"
@@ -102,15 +102,15 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "royalty_splits_user_id_users_id_fk": {
-          "name": "royalty_splits_user_id_users_id_fk",
-          "tableFrom": "royalty_splits",
+        "royaltysplits_user_name_users_name_fk": {
+          "name": "royaltysplits_user_name_users_name_fk",
+          "tableFrom": "royaltysplits",
           "tableTo": "users",
           "columnsFrom": [
-            "user_id"
+            "user_name"
           ],
           "columnsTo": [
-            "id"
+            "name"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -121,7 +121,7 @@
           "name": "split",
           "columns": [
             "paper_id",
-            "user_id"
+            "user_name"
           ]
         }
       },

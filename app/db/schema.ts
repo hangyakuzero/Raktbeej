@@ -6,31 +6,38 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+// USERS
 export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 255 }).notNull(),
-  papers_uploaded: integer(),
   email: varchar({ length: 255 }).notNull().unique(),
-  wallet_address: varchar(42),
+  wallet_address: varchar({ length: 42 }).unique(), // should be unique if used for lookup
+  papers_uploaded: integer().default(0),
   donations_recieved: integer().default(0),
 });
 
+// PAPERS — link to primary author
 export const papersTable = pgTable("papers", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   title: varchar({ length: 300 }).notNull(),
   link: varchar({ length: 500 }).notNull(),
+  topic: varchar({ length: 70 }).notNull(),
+  author_id: integer()
+    .references(() => usersTable.id, { onDelete: "set null" })
+    .notNull(), // primary author
 });
 
+// ROYALTY SPLITS — for other contributors only
 export const royaltySplitsTable = pgTable(
-  "royalty_splits",
+  "royaltysplits",
   {
-    paper_id: integer().references(() => papersTable.id),
-    user_id: integer().references(() => usersTable.id),
-    wallet_address: varchar(42), // Author's wallet address
-    percentage: integer().notNull(), // Royalty split percentage for the author
-    is_cited_author: boolean().notNull(), // Whether this author is a cited author
+    paper_id: integer()
+      .references(() => papersTable.id, { onDelete: "cascade" })
+      .notNull(),
+
+    wallet_address: varchar({ length: 42 }).notNull(), // co-author's wallet
+
+    percentage: integer().notNull(), // Royalty split
   },
-  (table) => [
-    primaryKey({ name: "split", columns: [table.paper_id, table.user_id] }),
-  ],
+  (table) => [primaryKey({ columns: [table.paper_id, table.wallet_address] })], // one entry per wallet per paper
 );

@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.12.12",
     "@neondatabase/serverless": "^1.0.0",
+    "@radix-ui/react-slot": "^1.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
@@ -18,9 +20,11 @@
     "lucide-react": "^0.487.0",
     "motion": "^12.6.3",
     "next": "15.2.4",
+    "next-themes": "^0.4.6",
     "pinata": "^2.1.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "svix": "^1.65.0",
     "tailwind-merge": "^3.1.0",
     "tw-animate-css": "^1.2.5"
   },

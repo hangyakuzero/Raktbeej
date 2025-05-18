@@ -1,6 +1,6 @@
 {
-  "id": "f63fc5f3-015a-4a46-b39d-af43b800d847",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "99d589f9-4e07-43c7-9750-d3553dde21b6",
+  "prevId": "98a07afa-bab6-44ab-8330-8c5a55027f7f",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -52,18 +52,12 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.royalty_splits": {
-      "name": "royalty_splits",
+    "public.royaltysplits": {
+      "name": "royaltysplits",
       "schema": "",
       "columns": {
         "paper_id": {
           "name": "paper_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -89,25 +83,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "royalty_splits_paper_id_papers_id_fk": {
-          "name": "royalty_splits_paper_id_papers_id_fk",
-          "tableFrom": "royalty_splits",
+        "royaltysplits_paper_id_papers_id_fk": {
+          "name": "royaltysplits_paper_id_papers_id_fk",
+          "tableFrom": "royaltysplits",
           "tableTo": "papers",
           "columnsFrom": [
             "paper_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "royalty_splits_user_id_users_id_fk": {
-          "name": "royalty_splits_user_id_users_id_fk",
-          "tableFrom": "royalty_splits",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -120,8 +101,7 @@
         "split": {
           "name": "split",
           "columns": [
-            "paper_id",
-            "user_id"
+            "paper_id"
           ]
         }
       },
