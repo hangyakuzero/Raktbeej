@@ -5,6 +5,6 @@ dotenv.config();
 module.exports = {
   solidity: "0.8.28",
   paths: {
-    artifacts: "./src/artifacts",
+    artifacts: "./app/artifacts",
   },
 };
