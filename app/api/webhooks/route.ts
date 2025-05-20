@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../db";
 import { usersTable } from "../../db/schema";
 import { eq } from "drizzle-orm";
+import { WebhookEvent } from "@clerk/clerk-sdk-node";
 
 // You should move this to env
 const CLERK_SECRET = process.env.CLERK_WEBHOOK_SIGNING_SECRET;

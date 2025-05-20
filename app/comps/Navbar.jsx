@@ -28,42 +28,35 @@ export default function Navbar() {
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a>Item 1</a>
+              <a>About</a>
             </li>
             <li>
-              <a>Parent</a>
-              <ul className="p-2">
-                <li>
-                  <a>Submenu 1</a>
-                </li>
-                <li>
-                  <a>Submenu 2</a>
-                </li>
-              </ul>
+              <a href="/papers">Papers</a>
             </li>
             <li>
-              <a>Item 3</a>
+              <a>Contact</a>
             </li>
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl">Raktbeej 🩸</a>
+        <a className="btn btn-ghost text-xl" href="/">
+          RAKTBEEJ 🩸
+        </a>
       </div>
       <div className="navbar-center m-3 px-6 hidden lg:flex">
         <ul className="menu menu-horizontal">
           <li>
-            <a>about</a>
+            <a href="/About">About</a>
           </li>
           <li>
             <a href="/papers">Papers</a>
           </li>
           <li>
-            <a>contact</a>
+            <a>Contact</a>
           </li>
         </ul>
       </div>
       <div className="navbar-end">
-        <Link href="/uploadpage" className="btn bg-red-500">
-          {" "}
+        <Link href="/uploadpage" className="btn bg-red-500 rounded-lg">
           Upload
         </Link>
       </div>

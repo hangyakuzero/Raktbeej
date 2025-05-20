@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import PDFViewer from "../../comps/PDFVIEWER";
 
 async function fetchPaperDetails(id: string) {
   try {
@@ -115,29 +116,9 @@ export default function Read() {
 
       <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* PDF Viewer Area */}
+
         <div className="lg:col-span-2 bg-base-200 rounded-lg shadow-lg overflow-hidden">
-          <object
-            data={paper?.link}
-            type="application/pdf"
-            height="600px"
-            width="100%"
-          >
-            <div className="p-6 text-center">
-              <p className="text-warning-content mb-4">
-                PDF preview is not available in your browser.
-              </p>
-              {paper?.link && (
-                <a
-                  href={paper.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary"
-                >
-                  Download PDF
-                </a>
-              )}
-            </div>
-          </object>
+          <PDFViewer fileUrl={paper?.link} />
         </div>
 
         {/* Paper Details and Donate Section */}

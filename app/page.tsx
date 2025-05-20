@@ -1,5 +1,5 @@
-import Head from 'next/head'
-import Navbar  from './comps/Navbar';
+import Head from "next/head";
+import Navbar from "./comps/Navbar";
 export default function Home() {
   return (
     <div className="text-2xl text-slate-50 ">
@@ -7,8 +7,39 @@ export default function Home() {
         <title>Raktbeej</title>
         <meta property="og:title" content="Raktbeej" key="title" />
       </Head>
-     <Navbar/>
-      <h1 className="justify-center">Nothing to see here for now</h1>
+      <Navbar />
+      <div className="hero bg-base-200 min-h-screen">
+        <div className="hero-content flex-col lg:flex-row-reverse">
+          <img
+            src="mascot.png"
+            className="max-w-sm rounded-lg shadow-2xl h-[30rem] text-shadow-2xl hover:border-pink-500 border-cyan-500 border-2"
+          />
+          <div>
+            <h1 className="text-5xl font-bold">
+              Welcome To{" "}
+              <span className="hover:underline decoration-1 hover:decoration-pink-700 bg-gradient-to-r from-red-400 via-red-600 to-red-700 bg-clip-text text-transparent">
+                Raktbeej
+              </span>
+            </h1>
+            <h2 className="font-semibold ">
+              Shape the Future of Decentralized Science
+            </h2>
+            <p className="py-6">
+              Empower innovation through incentivized research and seamless
+              collaboration. Predefine royalty splits on each paper—donations
+              are automatically distributed to collaborators’ wallets, ensuring
+              fair, transparent rewards.{" "}
+            </p>
+            <div className="group inline-block relative">
+              <button className="btn bg-gradient-to-r from-amber-400 via-orange-200 to-amber-500  rounded-lg  shadow-2xl text-black h-13 w-30 hover:border-black hover:border-2">
+                Get Started
+              </button>
+              <span className="absolute inset-x-0 bottom-px bg-gradient-to-r from-transparent via-cyan-400 to-cyan-500 h-[2px] w-3/4 "></span>
+              <span className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-300 inset-x-0 bottom-px bg-gradient-to-r from-transparent via-cyan-400 to-cyan-500 h-[2px] w-3/4  shadow-2xl"></span>
+            </div>
+          </div>
+        </div>
+      </div>{" "}
     </div>
   );
 }
