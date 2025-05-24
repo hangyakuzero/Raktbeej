@@ -64,6 +64,13 @@
       "when": 1747570912748,
       "tag": "0008_busy_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1748107812699,
+      "tag": "0009_test",
+      "breakpoints": true
     }
   ]
 }

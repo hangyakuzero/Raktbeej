@@ -1,17 +1,79 @@
-"use client"; // Next.js 13+ client component
+"use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import PDFViewer from "../../comps/PDFVIEWER";
+import { ethers } from "ethers";
 
-async function fetchPaperDetails(id: string) {
+import OpenDonationSplitter from "../../../artifacts/contracts/Donate.sol/OpenDonationSplitter.json"; // Import the OpenDonationSplitter contract
+
+const CONTRACT_ADDRESS = "0x8b005B4dBceD11B6e8F41e28bc2805CD6a006258"; // e.g., "0x123..."
+const POLYGON_AMOY_CHAIN_ID = "0x13882";
+const CONTRACT_ABI = [
+  // Paste your contract's ABI here. For OpenDonationSplitter, it would be:
+  {
+    inputs: [
+      {
+        internalType: "address[]",
+        name: "recipients",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "percentages",
+        type: "uint256[]",
+      },
+    ],
+    name: "donateAndSplit",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  // You might have other functions or events in your full ABI
+];
+// --- End of Smart Contract Details ---
+
+// Define types for data structures
+interface Paper {
+  id: string;
+  title: string;
+  link: string;
+  topic: string;
+  authorName: string | null;
+  authorWallet: string | null; // Primary author's wallet, might be used if no splits
+  // Add any other fields your paper object has
+}
+
+interface RoyaltySplit {
+  wallet_address: string;
+  percentage: number; // e.g., 20 for 20%
+}
+
+async function fetchPaperDetails(id: string): Promise<Paper | null> {
   try {
-    const response = await fetch(`/api/papers/${id}`);
-    if (!response.ok) throw new Error("Failed to fetch paper details");
+    const response = await fetch(`/api/papers/${id}`); // Assuming this API returns the Paper structure
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to fetch paper details");
+    }
     return await response.json();
   } catch (e) {
-    console.error(e);
+    console.error("Error in fetchPaperDetails:", e);
     return null;
+  }
+}
+
+async function fetchRoyaltySplits(id: string): Promise<RoyaltySplit[]> {
+  try {
+    const response = await fetch(`/api/papers/${id}/royaltysplits`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to fetch royalty splits");
+    }
+    return await response.json();
+  } catch (e) {
+    console.error("Error in fetchRoyaltySplits:", e);
+    return []; // Return empty array on error to prevent crashes
   }
 }
 
@@ -48,65 +110,248 @@ function CreditCardIcon() {
 }
 
 export default function Read() {
-  const pathname = usePathname(); // e.g., "/papers/123"
-  const [paper, setPaper] = useState(null);
+  const pathname = usePathname();
+  const [paper, setPaper] = useState<Paper | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [donationAmount, setDonationAmount] = useState<string>("5");
+  const [donationAmount, setDonationAmount] = useState<string>("5"); // Assuming POL means Polygon (MATIC)
   const [donationMessage, setDonationMessage] = useState<string | null>(null);
   const [isDonating, setIsDonating] = useState(false);
 
-  // Extract ID from pathname
   const paperId = pathname?.split("/").pop() || "";
 
   useEffect(() => {
     if (!paperId) {
-      setError("Invalid paper ID");
+      setError("Invalid paper ID in URL.");
       setLoading(false);
       return;
     }
-
+    setLoading(true);
     fetchPaperDetails(paperId).then((data) => {
       if (data) {
         setPaper(data);
         setError(null);
       } else {
-        setError("Could not load paper details");
+        setPaper(null); // Ensure paper is null if fetch fails
+        setError(
+          "Could not load paper details. The paper might not exist or there was a network issue.",
+        );
       }
       setLoading(false);
     });
   }, [paperId]);
 
   const handleDonate = async () => {
-    if (parseFloat(donationAmount) <= 0) {
-      setDonationMessage("Please enter a valid donation amount.");
+    if (!paper || !paperId) {
+      setDonationMessage("Paper details not loaded.");
+      return;
+    }
+
+    const amountToDonate = parseFloat(donationAmount);
+    if (isNaN(amountToDonate) || amountToDonate <= 0) {
+      setDonationMessage("Please enter a valid positive donation amount.");
       return;
     }
 
     setIsDonating(true);
-    setDonationMessage(null);
-    // --- Placeholder for actual donation logic ---
-    console.log(
-      `Attempting to donate ${donationAmount} to author wallet: ${paper.authorWallet}`,
-    );
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setDonationMessage(
-      `Thank you for your donation of $${donationAmount} to ${paper.authorName}! (This is a simulation)`,
-    );
-    setIsDonating(false);
-    // --- End of placeholder ---
+    setDonationMessage("Preparing donation...");
+
+    try {
+      // 1. Check for MetaMask (or other EIP-1193 provider)
+      // @ts-ignore
+      if (!window.ethereum) {
+        setDonationMessage(
+          "MetaMask (or another Web3 wallet) is not installed. Please install it to donate.",
+        );
+        setIsDonating(false);
+        return;
+      }
+
+      const currentChainId = await window.ethereum.request({
+        method: "eth_chainId",
+      });
+      if (currentChainId !== POLYGON_AMOY_CHAIN_ID) {
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: POLYGON_AMOY_CHAIN_ID }],
+          });
+        } catch (switchError: any) {
+          // If the network is not added to MetaMask, attempt to add it
+          if (switchError.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: "wallet_addEthereumChain",
+                params: [
+                  {
+                    chainId: POLYGON_AMOY_CHAIN_ID,
+                    chainName: "Polygon Amoy",
+                    rpcUrls: ["https://rpc-amoy.polygon.technology"],
+                    nativeCurrency: {
+                      name: "MATIC",
+                      symbol: "MATIC",
+                      decimals: 18,
+                    },
+                    blockExplorerUrls: ["https://amoy.polygonscan.com/"],
+                  },
+                ],
+              });
+            } catch (addError) {
+              setDonationMessage("Failed to add Polygon Amoy network.");
+              setIsDonating(false);
+              return;
+            }
+          } else {
+            setDonationMessage(
+              "Please switch to the Polygon Amoy network in your wallet.",
+            );
+            setIsDonating(false);
+            return;
+          }
+        }
+      }
+
+      // 2. Connect to the wallet and get the signer
+      // @ts-ignore
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []); // Request account access
+      const signer = await provider.getSigner();
+      const userAddress = await signer.getAddress();
+      setDonationMessage(
+        `Wallet connected: ${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`,
+      );
+
+      // 3. Fetch royalty splits
+      setDonationMessage("Fetching royalty splits...");
+      const splits = await fetchRoyaltySplits(paperId);
+      console.log(splits);
+      let recipients: string[] = [];
+      let percentagesInBasisPoints: ethers.BigNumberish[] = []; // Use BigNumberish for contract
+
+      if (splits && splits.length > 0) {
+        recipients = splits.map((split) => split.wallet_address);
+        // Convert percentages (e.g., 20 for 20%) to basis points (2000 for 20%)
+        // This line correctly converts database percentage (e.g., 20) to basis points (20 * 100 = 2000)
+        percentagesInBasisPoints = splits.map((split) =>
+          BigInt(split.percentage * 100),
+        );
+        console.log(percentagesInBasisPoints);
+        // REMOVED: Frontend validation for total percentage sum
+        // const totalPercentageForContract = percentagesInBasisPoints.reduce((sum, p) => sum + BigInt(p.toString()), BigInt(0));
+        // if (totalPercentageForContract !== BigInt(10000)) {
+        //     setDonationMessage(`Error: Royalty split percentages do not sum to 100%. Sum is ${Number(totalPercentageForContract) / 100}%. Please contact support.`);
+        //     setIsDonating(false);
+        //     return;
+        // }
+      } else if (paper.authorWallet) {
+        // If no splits defined, assume 100% to the primary author if their wallet is available
+        setDonationMessage(
+          "No specific royalty splits found. Assuming 100% to primary author.",
+        );
+        recipients = [paper.authorWallet];
+        percentagesInBasisPoints = [BigInt(10000)]; // 10000 basis points = 100%
+      } else {
+        setDonationMessage(
+          "No royalty recipients configured for this paper and primary author wallet is missing.",
+        );
+        setIsDonating(false);
+        return;
+      }
+
+      // Check if recipients array is empty after processing splits
+      if (recipients.length === 0) {
+        setDonationMessage("No valid recipients found for the donation.");
+        setIsDonating(false);
+        return;
+      }
+
+      setDonationMessage(
+        `Recipients: ${recipients.join(", ")}. Preparing transaction...`,
+      );
+
+      // 4. Instantiate the contract
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        CONTRACT_ABI,
+        signer,
+      );
+
+      // 5. Call the donateAndSplit function
+      // Convert donationAmount (string, e.g., "5" POL/MATIC) to Wei (BigNumber)
+      const amountInWei = ethers.parseUnits(donationAmount, 18); // Assuming 18 decimals for POL/MATIC
+      console.log(amountInWei);
+      setDonationMessage("Please confirm the transaction in your wallet...");
+      const tx = await contract.donateAndSplit(
+        recipients,
+        percentagesInBasisPoints,
+        {
+          value: amountInWei,
+        },
+      );
+
+      setDonationMessage(
+        `Transaction sent! Hash: ${tx.hash.substring(0, 10)}... Waiting for confirmation...`,
+      );
+      await tx.wait(); // Wait for the transaction to be mined
+
+      setDonationMessage(
+        `Donation of ${donationAmount} MATIC successful! Thank you!`,
+      ); // Changed POL to MATIC for consistency
+      // Optionally reset donation amount or give further user feedback
+      // setDonationAmount("5");
+    } catch (err: any) {
+      console.error("Donation failed:", err);
+      if (err.code === 4001) {
+        // User rejected transaction
+        setDonationMessage("Transaction rejected in wallet.");
+      } else if (err.message.includes("insufficient funds")) {
+        setDonationMessage(
+          "Donation failed: Insufficient funds for transaction.",
+        );
+      } else {
+        // Try to get a more specific error from the contract if available
+        const contractErrorReason = err.data?.message || err.reason;
+        setDonationMessage(
+          `Donation failed: ${contractErrorReason || err.message || "An unknown error occurred."}`,
+        );
+      }
+    } finally {
+      setIsDonating(false);
+    }
   };
 
-  if (loading) return <p className="py-4 px-6">Loading paper details...</p>;
-  if (error) return <p className="py-4 px-6 text-red-600">Error: {error}</p>;
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-base-100">
+        <span className="loading loading-ring loading-lg text-primary"></span>
+        <p className="ml-4 text-lg">Loading paper details...</p>
+      </div>
+    );
+
+  if (error || !paper)
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-100 p-6">
+        <h2 className="text-2xl font-semibold text-error mb-4">
+          Error Loading Paper
+        </h2>
+        <p className="text-base-content/80 mb-6 text-center">
+          {error || "The paper data could not be loaded."}
+        </p>
+        <Link href="/papers" className="btn btn-primary">
+          <ArrowLeftIcon /> Go Back to Papers
+        </Link>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-base-100 text-base-content">
       <div className="bg-emerald-400 py-3 px-4 sm:px-6 shadow-md">
+        {" "}
+        {/* Using emerald-400 as in your example */}
         <div className="max-w-7xl mx-auto">
           <Link
             href="/papers"
-            className="btn btn-ghost btn-sm flex items-center gap-2"
+            className="btn btn-ghost btn-sm flex items-center gap-2 text-emerald-900 hover:bg-emerald-500"
           >
             <ArrowLeftIcon />
             Back to Papers
@@ -115,39 +360,50 @@ export default function Read() {
       </div>
 
       <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* PDF Viewer Area */}
-
         <div className="lg:col-span-2 bg-base-200 rounded-lg shadow-lg overflow-hidden">
-          <PDFViewer fileUrl={paper?.link} />
+          {paper.link ? (
+            <PDFViewer fileUrl={paper.link} />
+          ) : (
+            <div className="h-[600px] flex items-center justify-center text-center p-6">
+              <p className="text-xl text-base-content/70">
+                PDF link is not available for this paper.
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Paper Details and Donate Section */}
-        <aside className="lg:col-span-1 space-y-4">
+        <aside className="lg:col-span-1 space-y-6">
+          {" "}
+          {/* Increased space-y */}
           <div className="bg-base-200 rounded-lg shadow-md p-6">
-            <h1 className="text-2xl text-slate-200 font-bold text-primary mb-2">
-              {paper?.title}
+            <h1 className="text-2xl font-bold text-slate-200 mb-2 break-words">
+              {" "}
+              {/* text-slate-200 removed, using theme's primary */}
+              {paper.title}
             </h1>
-            <p className="text-sm text-base-content/70 mb-1">
-              <strong>Topic:</strong> {paper?.topic}
+            <p className="text-sm text-base-content/80 mb-1">
+              <strong>Topic:</strong> {paper.topic || "N/A"}
             </p>
-            <p className="text-sm text-base-content/70">
-              <strong>Author:</strong> {paper?.authorName || "Unknown"}
+            <p className="text-sm text-base-content/80">
+              <strong>Author:</strong> {paper.authorName || "Unknown"}
             </p>
           </div>
-
           <div className="card bg-base-200 shadow-xl">
             <div className="card-body">
               <h2 className="card-title text-lg text-secondary">
-                Support Author
+                Support Author(s)
               </h2>
+              <p className="text-xs text-base-content/60 mb-1">
+                Donate using Polygon (MATIC).
+              </p>
 
               <div className="form-control w-full">
                 <label className="label" htmlFor="donationAmount">
-                  <span className="label-text">Amount (POL)</span>
+                  <span className="label-text">Amount (MATIC)</span>
                 </label>
                 <div className="join">
-                  <button className="btn join-item rounded-l-full pointer-events-none">
-                    POL
+                  <button className="btn join-item rounded-l-full pointer-events-none !bg-primary-focus !text-primary-content">
+                    MATIC
                   </button>
                   <input
                     type="number"
@@ -156,28 +412,36 @@ export default function Read() {
                     className="input input-bordered join-item w-full"
                     value={donationAmount}
                     onChange={(e) => setDonationAmount(e.target.value)}
-                    min="1"
-                    step="1"
+                    min="0.01" // Minimum donation amount
+                    step="0.01"
                     disabled={isDonating}
                   />
                 </div>
               </div>
-              <div className="card-actions justify-end mt-4">
+              <div className="card-actions justify-start mt-4">
+                {" "}
+                {/* Changed to justify-start */}
                 <button
-                  className={`btn btn-accent ${isDonating ? "loading" : ""}`}
+                  className={`btn btn-accent w-full sm:w-auto ${isDonating ? "loading" : ""}`} // Responsive width
                   onClick={handleDonate}
                   disabled={isDonating}
                 >
-                  <CreditCardIcon /> Donate
+                  <CreditCardIcon />{" "}
+                  {isDonating ? "Processing..." : "Donate Now"}
                 </button>
               </div>
               {donationMessage && (
                 <div
-                  className={`mt-2 p-2 rounded-md text-sm ${
+                  className={`mt-3 p-3 text-slate-200 rounded-md text-sm shadow ${
                     donationMessage.includes("failed") ||
-                    donationMessage.includes("not available")
-                      ? "bg-error/20 text-error-content"
-                      : "bg-success/20 text-success-content"
+                    donationMessage.includes("not available") ||
+                    donationMessage.includes("Error:") ||
+                    donationMessage.includes("rejected")
+                      ? "bg-error/20 text-error-content border border-error"
+                      : donationMessage.includes("successful") ||
+                          donationMessage.includes("Thank you")
+                        ? "bg-success/20 text-slate-200 border border-success"
+                        : "bg-info/20 text-info-content border border-info" // For intermediate messages
                   }`}
                 >
                   {donationMessage}

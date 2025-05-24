@@ -11,7 +11,7 @@ export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 255 }).notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
-  wallet_address: varchar({ length: 42 }).unique(), // should be unique if used for lookup
+  wallet_address: varchar({ length: 42 }), // should be unique if used for lookup
   papers_uploaded: integer().default(0),
   donations_recieved: integer().default(0),
 });
@@ -35,7 +35,7 @@ export const royaltySplitsTable = pgTable(
       .references(() => papersTable.id, { onDelete: "cascade" })
       .notNull(),
 
-    wallet_address: varchar({ length: 42 }).notNull(), // co-author's wallet
+    wallet_address: varchar({ length: 42 }).notNull(),
 
     percentage: integer().notNull(), // Royalty split
   },
