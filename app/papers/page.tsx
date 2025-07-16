@@ -27,22 +27,7 @@ const BookOpenIcon = () => (
     <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.509a.75.75 0 0 0 .5.707A9.735 9.735 0 0 0 6 21a9.707 9.707 0 0 0 5.25-1.533A9.707 9.707 0 0 0 18 21a9.735 9.735 0 0 0 3.25-.555.75.75 0 0 0 .5-.707V4.262a. ৭৫.75 0 0 0-.5-.707A9.735 9.735 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533Z" />
   </svg>
 );
-function ArrowLeftIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className="w-5 h-5"
-    >
-      <path
-        fillRule="evenodd"
-        d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
+
 
 const UserCircleIcon = () => (
   <svg
@@ -96,17 +81,7 @@ export default function PapersPage() {
         />
       </Head>
       <div className="bg-base-100 text-base-content min-h-screen  sm:pb-4 top-0 pb-3">
-        <div className="bg-emerald-400 py-3 px-4 sm:px-6 shadow-md">
-          <div className="max-w-7xl mx-auto">
-            <Link
-              href="/"
-              className="btn btn-ghost btn-sm flex items-center gap-2"
-            >
-              <ArrowLeftIcon />
-              Back to Homepage
-            </Link>
-          </div>
-        </div>
+
         <header className="text-center mb-12">
           <h1 className="py-4 text-4xl sm:text-5xl text-slate-200 font-bold text-primary">
             Explore Research Papers
@@ -166,7 +141,7 @@ export default function PapersPage() {
               {papers.map((paper) => (
                 <div
                   key={paper.id}
-                  className="card flex bg-base-200 shadow-xl shadow-emerald-300 hover:shadow-2xl transition-shadow duration-300 ease-in-out"
+                  className="card py-8 hover:scale-110 hover:delay-75 hover:ease-in flex bg-base-200 shadow-md shadow-emerald-300 hover:shadow-2xl transition-shadow duration-300 ease-in-out"
                 >
                   <div className="card-body">
                     <h2 className="card-title text-xl font-bold  mt-1 mb-2">

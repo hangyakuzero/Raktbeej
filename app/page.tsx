@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Navbar from "./comps/Navbar";
 import { SignUp } from "@clerk/nextjs";
+import Link from "next/link";
 export default function Home() {
   return (
     <div className="text-2xl text-slate-50 ">
@@ -8,7 +9,7 @@ export default function Home() {
         <title>Raktbeej</title>
         <meta property="og:title" content="Raktbeej" key="title" />
       </Head>
-      <Navbar />
+     
       <div className="hero bg-base-200 min-h-screen">
         <div className="hero-content flex-col lg:flex-row-reverse">
           <img
@@ -32,11 +33,11 @@ export default function Home() {
               fair, transparent rewards.{" "}
             </p>
             <div className="group inline-block relative">
-              <a href="/sign-up">
+              <Link href="/sign-up">
                 <button className="btn bg-gradient-to-r from-amber-400 via-orange-200 to-amber-500  rounded-lg  shadow-2xl text-black h-13 w-30 hover:border-black hover:border-2">
                   Get Started
                 </button>
-              </a>
+              </Link>
               <span className="absolute inset-x-0 bottom-px bg-gradient-to-r from-transparent via-cyan-400 to-cyan-500 h-[2px] w-3/4 "></span>
               <span className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-300 inset-x-0 bottom-px bg-gradient-to-r from-transparent via-cyan-400 to-cyan-500 h-[2px] w-3/4  shadow-2xl"></span>
             </div>

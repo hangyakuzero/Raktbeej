@@ -1,13 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import PDFViewer from "../../comps/PDFVIEWER";
 import { ethers } from "ethers";
 
 import OpenDonationSplitter from "../../../artifacts/contracts/Donate.sol/OpenDonationSplitter.json"; // Import the OpenDonationSplitter contract
 
-const CONTRACT_ADDRESS = "0x8b005B4dBceD11B6e8F41e28bc2805CD6a006258"; // e.g., "0x123..."
+const CONTRACT_ADDRESS = "0xa7Ac4c614B8c00e1892DDB141D8524e0828418e1"; // e.g., "0x123..."
 const POLYGON_AMOY_CHAIN_ID = "0x13882";
 const CONTRACT_ABI = [
   // Paste your contract's ABI here. For OpenDonationSplitter, it would be:
@@ -29,7 +28,7 @@ const CONTRACT_ABI = [
     stateMutability: "payable",
     type: "function",
   },
-  // You might have other functions or events in your full ABI
+
 ];
 // --- End of Smart Contract Details ---
 
@@ -41,7 +40,7 @@ interface Paper {
   topic: string;
   authorName: string | null;
   authorWallet: string | null; // Primary author's wallet, might be used if no splits
-  // Add any other fields your paper object has
+
 }
 
 interface RoyaltySplit {
@@ -77,22 +76,7 @@ async function fetchRoyaltySplits(id: string): Promise<RoyaltySplit[]> {
   }
 }
 
-function ArrowLeftIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className="w-5 h-5"
-    >
-      <path
-        fillRule="evenodd"
-        d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
+
 
 function CreditCardIcon() {
   return (
@@ -114,7 +98,7 @@ export default function Read() {
   const [paper, setPaper] = useState<Paper | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [donationAmount, setDonationAmount] = useState<string>("5"); // Assuming POL means Polygon (MATIC)
+  const [donationAmount, setDonationAmount] = useState<string>("5"); // Assuming POL means Polygon (POL)
   const [donationMessage, setDonationMessage] = useState<string | null>(null);
   const [isDonating, setIsDonating] = useState(false);
 
@@ -192,7 +176,7 @@ export default function Read() {
                       symbol: "MATIC",
                       decimals: 18,
                     },
-                    blockExplorerUrls: ["https://amoy.polygonscan.com/"],
+                    blockExplorerUrls: ["www.oklink.com/amoy"],
                   },
                 ],
               });
@@ -281,11 +265,22 @@ export default function Read() {
       const amountInWei = ethers.parseUnits(donationAmount, 18); // Assuming 18 decimals for POL/MATIC
       console.log(amountInWei);
       setDonationMessage("Please confirm the transaction in your wallet...");
+
+      const estimatedGas = await contract.donateAndSplit.estimateGas(
+        recipients,
+        percentagesInBasisPoints,
+        { value: amountInWei },
+      );
+      console.log("Estimated gas:", estimatedGas.toString());
+      const additional = (estimatedGas * BigInt(40)) / BigInt(100);
+      const gasLimit = estimatedGas + additional;
       const tx = await contract.donateAndSplit(
         recipients,
         percentagesInBasisPoints,
         {
           value: amountInWei,
+          gasLimit: gasLimit,
+          //gasPrice: gasLimit,
         },
       );
 
@@ -295,7 +290,7 @@ export default function Read() {
       await tx.wait(); // Wait for the transaction to be mined
 
       setDonationMessage(
-        `Donation of ${donationAmount} MATIC successful! Thank you!`,
+        `Donation of ${donationAmount} MATIC successful! Thank you! ${tx.hash}`,
       ); // Changed POL to MATIC for consistency
       // Optionally reset donation amount or give further user feedback
       // setDonationAmount("5");
@@ -337,27 +332,13 @@ export default function Read() {
         <p className="text-base-content/80 mb-6 text-center">
           {error || "The paper data could not be loaded."}
         </p>
-        <Link href="/papers" className="btn btn-primary">
-          <ArrowLeftIcon /> Go Back to Papers
-        </Link>
+ 
       </div>
     );
 
   return (
     <div className="min-h-screen bg-base-100 text-base-content">
-      <div className="bg-emerald-400 py-3 px-4 sm:px-6 shadow-md">
-        {" "}
-        {/* Using emerald-400 as in your example */}
-        <div className="max-w-7xl mx-auto">
-          <Link
-            href="/papers"
-            className="btn btn-ghost btn-sm flex items-center gap-2 text-emerald-900 hover:bg-emerald-500"
-          >
-            <ArrowLeftIcon />
-            Back to Papers
-          </Link>
-        </div>
-      </div>
+
 
       <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 bg-base-200 rounded-lg shadow-lg overflow-hidden">
@@ -394,7 +375,7 @@ export default function Read() {
                 Support Author(s)
               </h2>
               <p className="text-xs text-base-content/60 mb-1">
-                Donate using Polygon (MATIC).
+                Donate using Polygon (POL).
               </p>
 
               <div className="form-control w-full">
@@ -403,7 +384,7 @@ export default function Read() {
                 </label>
                 <div className="join">
                   <button className="btn join-item rounded-l-full pointer-events-none !bg-primary-focus !text-primary-content">
-                    MATIC
+                    POL
                   </button>
                   <input
                     type="number"
@@ -437,11 +418,11 @@ export default function Read() {
                     donationMessage.includes("not available") ||
                     donationMessage.includes("Error:") ||
                     donationMessage.includes("rejected")
-                      ? "bg-error/20 text-error-content border border-error"
+                      ? "bg-error/20 text-error-content border border-error overflow-auto"
                       : donationMessage.includes("successful") ||
                           donationMessage.includes("Thank you")
-                        ? "bg-success/20 text-slate-200 border border-success"
-                        : "bg-info/20 text-info-content border border-info" // For intermediate messages
+                        ? "bg-success/20 text-slate-200 border border-success overflow-auto"
+                        : "bg-info/20 text-slate-200 border border-info" // For intermediate messages
                   }`}
                 >
                   {donationMessage}

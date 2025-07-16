@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react"; // Added useRef for file input reset
 import { useUser } from "@clerk/nextjs";
-import Link from "next/link";
+
 
 // A simple X icon for the remove button (replace with an SVG icon if you have an icon library)
 const XIcon = () => (
@@ -35,8 +35,13 @@ export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null); // For resetting file input
 
   const [royaltySplits, setRoyaltySplits] = useState<
-    { wallet_address: string; percentage: number }[]
+    { wallet_address: string; percentage: number  }[]
   >([{ wallet_address: "", percentage: 0 }]);
+  
+  interface RoyaltySplit {
+  wallet_address: string;
+  percentage: number;
+}
 
   const resetFormFields = () => {
     setFile(null);
@@ -181,12 +186,7 @@ export default function Home() {
   return (
     <div className="bg-base-100 text-base-content min-h-screen py-8 sm:py-12 px-4">
       <div className="fixed flex w-full  top-0">
-        <Link
-          href="/"
-          className="bg-emerald-400 w-screen text-black font-bold text-lg text-center"
-        >
-          Back to HomePage
-        </Link>
+
       </div>
       <main className="w-full max-w-2xl mx-auto">
         <div className="bg-base-200 shadow-xl rounded-lg p-6 sm:p-10 space-y-6">

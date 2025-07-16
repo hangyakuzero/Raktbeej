@@ -7,7 +7,8 @@ export async function GET(
   req: Request,
   { params }: { params: { id: string } },
 ) {
-  const paperId = parseInt(params.id);
+  const k = await params;
+  const paperId =  parseInt(k.id);
 
   if (isNaN(paperId)) {
     return NextResponse.json({ error: "Invalid paper ID" }, { status: 400 });

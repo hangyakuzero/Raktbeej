@@ -1,5 +1,14 @@
 import React from "react";
 import Link from "next/link";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
+
 
 export default function Navbar() {
   return (
@@ -43,7 +52,7 @@ export default function Navbar() {
         </a>
       </div>
       <div className="navbar-center m-3 px-6 hidden lg:flex">
-        <ul className="menu menu-horizontal">
+        <ul className="menu menu-horizontal font-light">
           <li>
             <a href="/About">About</a>
           </li>
@@ -51,14 +60,33 @@ export default function Navbar() {
             <a href="/papers">Papers</a>
           </li>
           <li>
-            <a>Contact</a>
+            <a href="/contact">Contact</a>
           </li>
         </ul>
       </div>
       <div className="navbar-end">
-        <Link href="/uploadpage" className="btn bg-red-500 rounded-lg">
+        <SignedIn>
+          <UserButton />
+          <Link href="/dashboard" className="text-lg px-4">
+            Dashboard
+          </Link>
+                  <Link href="/uploadpage" className="btn bg-red-500 hover:bg-[#F9564F] transition-all delay-75 ease-in-out rounded-lg">
           Upload
         </Link>
+        </SignedIn>
+           <SignedOut>
+      <div className="btn bg-blue-500 hover:bg-blue-600 transition-all delay-75 ease-in-out rounded-lg">  
+       <SignInButton />
+
+     </div>  
+<span className="btn bg-slate-50 hover:bg-zinc-950 hover:text-slate-50 transition-all delay-75 ease-in-out text-black rounded-lg ml-2">
+           <SignUpButton />
+</span>
+      
+          </SignedOut>
+
+ 
+
       </div>
     </div>
   );

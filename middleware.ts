@@ -1,6 +1,7 @@
 import { clerkMiddleware,  createRouteMatcher } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 
-const isProtectedRoute = createRouteMatcher(['/uploadpage'])
+const isProtectedRoute = createRouteMatcher(['/uploadpage','/dashboard'])
 
 
 export default clerkMiddleware(async (auth, req) => {

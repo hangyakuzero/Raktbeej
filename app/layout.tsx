@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import Navbar from "./comps/Navbar";
+import "./globals.css";
+
 import {
   ClerkProvider,
   SignInButton,
@@ -38,17 +39,19 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-base-100`}
         >
           <header>
+            <div className="text-slate-50">
+             <Navbar />
             <SignedOut>
               {/*  <SignInButton />
               <SignUpButton /> */}
             </SignedOut>
-            <SignedIn>
-              {" "}
-              <UserButton />{" "}
-            </SignedIn>
+    
+  
+            </div>
           </header>
-
+<div className="text-slate-50">
           {children}
+          </div>
         </body>
       </html>
     </ClerkProvider>

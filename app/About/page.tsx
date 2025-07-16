@@ -1,9 +1,9 @@
 import React from "react";
-import Navbar from "../comps/Navbar";
+
 function HOME() {
   return (
     <div className="text-slate-200 font-semibold justify-center items-center">
-      <Navbar />
+
       <div
         className="text-center"
         style={{
