@@ -1,10 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import PDFViewer from "../../comps/PDFVIEWER";
+import dynamic from 'next/dynamic';
 import { ethers } from "ethers";
 import { Jersey_10 } from "next/font/google";
 const jersey10 = Jersey_10({ subsets: ["latin"], weight: "400" });
+
+const PDFViewer = dynamic(() => import('../../comps/PDFVIEWER'), { ssr: false });
 
 // Add global type for window.ethereum
 declare global {
