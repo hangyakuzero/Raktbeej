@@ -1,6 +1,5 @@
 import {
   integer,
-  boolean,
   primaryKey,
   pgTable,
   varchar,

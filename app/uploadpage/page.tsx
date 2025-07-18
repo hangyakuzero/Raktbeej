@@ -38,10 +38,7 @@ export default function Home() {
     { wallet_address: string; percentage: number  }[]
   >([{ wallet_address: "", percentage: 0 }]);
   
-  interface RoyaltySplit {
-  wallet_address: string;
-  percentage: number;
-}
+
 
   const resetFormFields = () => {
     setFile(null);
@@ -129,8 +126,11 @@ export default function Home() {
       setUrl(responseData.url);
       setSuccessMessage("File uploaded successfully! You can view it below.");
       resetFormFields(); // Reset form on success
-    } catch (e: any) {
-      setError("Trouble uploading file: " + e.message);
+    } catch (e) {
+      setError(
+        "Trouble uploading file: " +
+          (e instanceof Error ? e.message : String(e))
+      );
     } finally {
       setUploading(false);
     }
@@ -161,7 +161,7 @@ export default function Home() {
         newRoyaltySplits[index][field] = 100;
       else newRoyaltySplits[index][field] = Number(percentageValue);
     } else {
-      newRoyaltySplits[index][field] = percentageValue;
+      newRoyaltySplits[index][field] = typeof percentageValue === "string" ? percentageValue : String(percentageValue);
     }
     setRoyaltySplits(newRoyaltySplits);
   };

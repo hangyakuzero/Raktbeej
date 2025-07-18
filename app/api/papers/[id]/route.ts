@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { db } from "../../../db"; // Adjust the path based on your structure
 import { papersTable, usersTable } from "../../../db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } },
+  req: NextRequest,
+  { params }: { params: Promise< { id: string }> },
 ) {
   const k = await params;
   const paperId =  parseInt(k.id);

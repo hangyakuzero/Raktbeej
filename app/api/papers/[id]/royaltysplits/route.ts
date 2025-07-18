@@ -14,8 +14,9 @@ interface RoyaltySplit {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }>},
 ) {
+
   try {
      const k = await params;
     const paperId = parseInt(k.id, 10);
@@ -49,7 +50,7 @@ export async function GET(
     return NextResponse.json(splits, { status: 200 });
   } catch (error) {
     console.error(
-      `Error fetching royalty splits for paper ID ${params.id}:`,
+      `Error fetching royalty splits for paper ID ${params}:`,
       error,
     );
     const errorMessage =

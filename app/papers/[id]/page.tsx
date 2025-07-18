@@ -3,8 +3,22 @@ import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import PDFViewer from "../../comps/PDFVIEWER";
 import { ethers } from "ethers";
+import { Jersey_10 } from "next/font/google";
+const jersey10 = Jersey_10({ subsets: ["latin"], weight: "400" });
 
-import OpenDonationSplitter from "../../../artifacts/contracts/Donate.sol/OpenDonationSplitter.json"; // Import the OpenDonationSplitter contract
+// Add global type for window.ethereum
+declare global {
+  interface Window {
+    ethereum?: {
+      request: (args: { method: string; params?: any[] }) => Promise<any>;
+      on: (eventName: string, handler: (...args: any[]) => void) => void;
+      removeListener: (eventName: string, handler: (...args: any[]) => void) => void;
+      isMetaMask?: boolean;
+    };
+  }
+}
+
+
 
 const CONTRACT_ADDRESS = "0xa7Ac4c614B8c00e1892DDB141D8524e0828418e1"; // e.g., "0x123..."
 const POLYGON_AMOY_CHAIN_ID = "0x13882";
@@ -142,7 +156,7 @@ export default function Read() {
 
     try {
       // 1. Check for MetaMask (or other EIP-1193 provider)
-      // @ts-ignore
+   
       if (!window.ethereum) {
         setDonationMessage(
           "MetaMask (or another Web3 wallet) is not installed. Please install it to donate.",
@@ -160,9 +174,9 @@ export default function Read() {
             method: "wallet_switchEthereumChain",
             params: [{ chainId: POLYGON_AMOY_CHAIN_ID }],
           });
-        } catch (switchError: any) {
+        } catch (switchError) {
           // If the network is not added to MetaMask, attempt to add it
-          if (switchError.code === 4902) {
+          if (typeof switchError === 'object' && switchError && 'code' in switchError && switchError.code === 4902) {
             try {
               await window.ethereum.request({
                 method: "wallet_addEthereumChain",
@@ -180,7 +194,7 @@ export default function Read() {
                   },
                 ],
               });
-            } catch (addError) {
+            } catch  {
               setDonationMessage("Failed to add Polygon Amoy network.");
               setIsDonating(false);
               return;
@@ -196,7 +210,6 @@ export default function Read() {
       }
 
       // 2. Connect to the wallet and get the signer
-      // @ts-ignore
       const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []); // Request account access
       const signer = await provider.getSigner();
@@ -294,9 +307,11 @@ export default function Read() {
       ); // Changed POL to MATIC for consistency
       // Optionally reset donation amount or give further user feedback
       // setDonationAmount("5");
-    } catch (err: any) {
-      console.error("Donation failed:", err);
-      if (err.code === 4001) {
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Donation failed:", err);
+        const metaMaskError = err as { code?: number };
+        if (metaMaskError.code === 4001) {
         // User rejected transaction
         setDonationMessage("Transaction rejected in wallet.");
       } else if (err.message.includes("insufficient funds")) {
@@ -305,11 +320,11 @@ export default function Read() {
         );
       } else {
         // Try to get a more specific error from the contract if available
-        const contractErrorReason = err.data?.message || err.reason;
+        const contractErrorReason = (err as any).data?.message || (err as any).reason;
         setDonationMessage(
           `Donation failed: ${contractErrorReason || err.message || "An unknown error occurred."}`,
         );
-      }
+      }}
     } finally {
       setIsDonating(false);
     }
@@ -319,7 +334,7 @@ export default function Read() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-base-100">
         <span className="loading loading-ring loading-lg text-primary"></span>
-        <p className="ml-4 text-lg">Loading paper details...</p>
+        <p className={"ml-4 text-2xl " + jersey10.className}>Loading paper details...</p>
       </div>
     );
 

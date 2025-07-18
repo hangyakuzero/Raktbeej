@@ -1,5 +1,7 @@
 import React from "react";
 import Link from "next/link";
+import { Inter } from "next/font/google";
+
 import {
   ClerkProvider,
   SignInButton,
@@ -8,6 +10,8 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
+
+const inter = Inter({ subsets: ["latin"], weight: "900" });
 
 
 export default function Navbar() {
@@ -47,12 +51,12 @@ export default function Navbar() {
             </li>
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl" href="/">
+        <a className={`btn btn-ghost  text-2xl ${inter.className}`} href="/">
           RAKTBEEJ 🩸
         </a>
       </div>
       <div className="navbar-center m-3 px-6 hidden lg:flex">
-        <ul className="menu menu-horizontal font-light">
+        <ul className={"menu font-bold menu-horizontal " }>
           <li>
             <a href="/About">About</a>
           </li>

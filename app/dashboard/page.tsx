@@ -1,7 +1,13 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
+import { Jersey_10 } from "next/font/google";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"], weight: "500" });
+const jersey10 = Jersey_10({ subsets: ["latin"], weight: "400" });
 
 interface RoyaltySplit {
   wallet_address: string;
@@ -29,20 +35,22 @@ export default function DashboardPage() {
       try {
         const res = await fetch(
           `/api/dashboard?email=${encodeURIComponent(
-            user.primaryEmailAddress?.emailAddress || ''
+            user.primaryEmailAddress?.emailAddress || "",
           )}`,
-          { cache: 'no-store' }
+          { cache: "no-store" },
         );
 
         if (!res.ok) {
           const err = await res.json();
-          throw new Error(err.error || 'Failed to load papers');
+          throw new Error(err.error || "Failed to load papers");
         }
 
         const data = await res.json();
         setPapers(data.papers || []);
-      } catch (err: any) {
-        setError(err.message || 'An unexpected error occurred');
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message || "An unexpected error occurred");
+        }
       } finally {
         setLoading(false);
       }
@@ -51,7 +59,8 @@ export default function DashboardPage() {
     fetchPapers();
   }, [user, isLoaded]);
 
-  if (!isLoaded || loading) return <p className="text-center mt-10">Loading...</p>;
+  if (!isLoaded || loading)
+    return <p className={"text-center mt-10 text-xl " + jersey10.className }>Loading...</p>;
 
   if (error)
     return (
@@ -61,8 +70,8 @@ export default function DashboardPage() {
     );
 
   return (
-    <div className="max-w-5xl mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold text-center mb-8">Your Uploaded Papers</h1>
+    <div className={"max-w-5xl mx-auto py-10 px-4 " + inter.className} >
+      <h1 className="text-3xl font-bold text-center mb-8">Your Papers</h1>
 
       {papers.length === 0 ? (
         <p className="text-center">You haven’t uploaded any papers yet.</p>
@@ -74,7 +83,7 @@ export default function DashboardPage() {
                 <th>Title</th>
                 <th>Topic</th>
                 <th>Royalty Splits</th>
-                <th>View</th>
+                <th>Read</th>
               </tr>
             </thead>
             <tbody>
@@ -96,7 +105,9 @@ export default function DashboardPage() {
                         <tbody>
                           {paper.splits.map((split, index) => (
                             <tr key={index}>
-                              <td className="font-mono truncate max-w-[150px]">{split.wallet_address}</td>
+                              <td className="font-mono truncate max-w-[150px]">
+                                {split.wallet_address}
+                              </td>
                               <td>{split.percentage}%</td>
                             </tr>
                           ))}
@@ -105,14 +116,14 @@ export default function DashboardPage() {
                     )}
                   </td>
                   <td>
-                    <a
-                      href={paper.link}
+                    <Link
+                      href={"/papers/" + paper.id}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-sm btn-outline btn-primary"
+                      className="btn bg-rose-400 btn-sm  rounded-md hover:bg-rose-500"
                     >
-                      View PDF
-                    </a>
+                      Read PDF
+                    </Link>
                   </td>
                 </tr>
               ))}

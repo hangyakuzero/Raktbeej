@@ -5,11 +5,9 @@ import "./globals.css";
 
 import {
   ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
+
   SignedOut,
-  UserButton,
+
 } from "@clerk/nextjs";
 
 const geistSans = Geist({
@@ -25,6 +23,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Raktbeej",
   description: "A De-sci project",
+    icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

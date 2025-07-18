@@ -4,7 +4,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Head from "next/head"; // For setting page title
-
+import { Jersey_10 } from "next/font/google";
+const jersey10 = Jersey_10({ subsets: ["latin"], weight: "400" });
 // Define the structure of a paper object we expect from the API
 interface Paper {
   id: number;
@@ -61,8 +62,12 @@ export default function PapersPage() {
         }
         const data: Paper[] = await response.json();
         setPapers(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
         console.error("Error fetching papers:", err);
       } finally {
         setIsLoading(false);
@@ -74,7 +79,7 @@ export default function PapersPage() {
   return (
     <>
       <Head>
-        <title>Research Papers | SciPub</title>
+        <title>Research Papers </title>
         <meta
           name="description"
           content="Browse through a collection of research papers."
@@ -83,10 +88,10 @@ export default function PapersPage() {
       <div className="bg-base-100 text-base-content min-h-screen  sm:pb-4 top-0 pb-3">
 
         <header className="text-center mb-12">
-          <h1 className="py-4 text-4xl sm:text-5xl text-slate-200 font-bold text-primary">
+          <h1 className={"py-4 text-6xl  drop-shadow-xl  text-green-400 font-bold " + jersey10.className}>
             Explore Research Papers
           </h1>
-          <p className="text-lg text-base-content/80 mt-2">
+          <p className="text-lg text-slate-200 font-semibold mt-1">
             Discover insights and knowledge from various fields.
           </p>
         </header>
@@ -95,7 +100,7 @@ export default function PapersPage() {
           {isLoading && (
             <div className="text-center py-10">
               <span className="loading loading-dots loading-lg text-primary"></span>
-              <p className="mt-2">Loading papers...</p>
+              <p className={"mt-2 text-xl " + jersey10.className}>Loading papers...</p>
             </div>
           )}
 
@@ -166,7 +171,7 @@ export default function PapersPage() {
                         href={{
                           pathname: `/papers/${paper.id}`,
                         }}
-                        className="btn btn-primary btn-sm "
+                        className="btn bg-rose-400 btn-sm "
                       >
                         Read Paper
                         <BookOpenIcon />
