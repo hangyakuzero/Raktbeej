@@ -69,8 +69,8 @@ export default function Navbar() {
             </SignedIn>
           </ul>
         </div>
-        <a className={`btn btn-ghost  text-2xl ${inter.className}`} href="/">
-          RAKTBEEJ 🩸
+        <a className={`flex whitespace-nowrap items-center text-2xl ${inter.className}`} href="/">
+          RAKTBEEJ🩸
         </a>
       </div>
       <div className="navbar-center m-3 px-6 hidden lg:flex">
@@ -100,16 +100,18 @@ export default function Navbar() {
         </Link>
    
         </SignedIn>
-           <SignedOut>
-      <div className="btn bg-blue-500 hover:bg-blue-600 transition-all delay-75 ease-in-out rounded-lg sm:-px-1 sm:py-2.5 sm:text-base  ">  
-       <SignInButton />
+<SignedOut>
+  <div className="flex items-center gap-2">
+    <div className="px-2.5 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition">
+      <SignInButton />
+    </div>
+    <div className="px-2.5 py-1.5 text-sm font-medium text-black bg-gray-100 rounded-md hover:bg-black hover:text-white transition">
+      <SignUpButton />
+    </div>
+  </div>
+</SignedOut>
 
-     </div>  
-<span className="btn bg-slate-50 hover:bg-zinc-950 hover:text-slate-50 transition-all delay-75 ease-in-out text-black rounded-lg ml-2">
-           <SignUpButton />
-</span>
-      
-          </SignedOut>
+
 
  
 
