@@ -102,10 +102,10 @@ export default function Navbar() {
         </SignedIn>
 <SignedOut>
   <div className="flex items-center gap-2">
-    <div className="px-2.5 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition">
+    <div className="px-1 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition">
       <SignInButton />
     </div>
-    <div className="px-2.5 py-1.5 text-sm font-medium text-black bg-gray-100 rounded-md hover:bg-black hover:text-white transition">
+    <div className="px-1 py-1.5 text-sm font-medium text-black bg-gray-100 rounded-md hover:bg-black hover:text-white transition">
       <SignUpButton />
     </div>
   </div>
