@@ -1,12 +1,9 @@
 import React from "react";
 import Link from "next/link";
 import { Inter } from "next/font/google";
-import { SignOutButton } from "@clerk/nextjs";  
-
 import {
-  ClerkProvider,
+  SignOutButton,
   SignInButton,
-  SignUpButton,
   SignedIn,
   SignedOut,
   UserButton,
@@ -14,10 +11,9 @@ import {
 
 const inter = Inter({ subsets: ["latin"], weight: "900" });
 
-
 export default function Navbar() {
   return (
-    <div className="navbar bg-base-100 shadow-sm ">
+    <div className="navbar bg-base-100 shadow-sm">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -28,13 +24,12 @@ export default function Navbar() {
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              {" "}
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth="2"
                 d="M4 6h16M4 12h8m-8 6h16"
-              />{" "}
+              />
             </svg>
           </div>
           <ul
@@ -51,30 +46,23 @@ export default function Navbar() {
               <a href="/contact">Contact</a>
             </li>
 
-            <SignedIn>  
-
-              <li>          
-              <Link href="/dashboard" className=" ">
-            Dashboard
-          </Link>
-          </li>
-
-
+            <SignedIn>
               <li>
-              
-              <SignOutButton/>
-
+                <Link href="/dashboard">Dashboard</Link>
               </li>
-
+              <li>
+                <SignOutButton />
+              </li>
             </SignedIn>
           </ul>
         </div>
-        <a className={`flex whitespace-nowrap items-center text-2xl ${inter.className}`} href="/">
-          RAKTBEEJ🩸
+        <a className={`btn btn-ghost text-2xl ${inter.className}`} href="/">
+          RAKTBEEJ 🩸
         </a>
       </div>
+
       <div className="navbar-center m-3 px-6 hidden lg:flex">
-        <ul className={"menu font-bold menu-horizontal " }>
+        <ul className="menu font-bold menu-horizontal">
           <li>
             <a href="/About">About</a>
           </li>
@@ -86,35 +74,34 @@ export default function Navbar() {
           </li>
         </ul>
       </div>
+
       <div className="navbar-end">
         <SignedIn>
-        <span className="hidden sm:block">
-          <UserButton />
-         
-          <Link href="/dashboard" className="text-lg px-4 ">
-            Dashboard
+          <span className="hidden sm:block">
+            <UserButton />
+            <Link href="/dashboard" className="text-lg px-4">
+              Dashboard
+            </Link>
+          </span>
+          <Link
+            href="/uploadpage"
+            className="btn bg-red-500 hover:bg-[#F9564F] transition-all delay-75 ease-in-out rounded-lg"
+          >
+            Upload
           </Link>
-           </span> 
-                  <Link href="/uploadpage" className="btn bg-red-500 hover:bg-[#F9564F] transition-all delay-75 ease-in-out rounded-lg">
-          Upload
-        </Link>
-   
         </SignedIn>
-<SignedOut>
-  <div className="flex items-center gap-2">
-    <div className="px-2.5 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition">
-      <SignInButton />
-    </div>
-    <div className="px-2.5 py-1.5 text-sm font-medium text-black bg-gray-100 rounded-md hover:bg-black hover:text-white transition">
-      <SignUpButton />
-    </div>
-  </div>
-</SignedOut>
 
-
-
- 
-
+        <SignedOut>
+          <SignInButton
+            mode="modal"
+            aftersigninurl="/uploadpage"
+            aftersignupurl="/uploadpage"
+          >
+            <button className="btn bg-red-500 hover:bg-[#F9564F] transition-all delay-75 ease-in-out rounded-lg">
+              Upload
+            </button>
+          </SignInButton>
+        </SignedOut>
       </div>
     </div>
   );

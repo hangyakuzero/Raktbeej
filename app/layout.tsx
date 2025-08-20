@@ -3,12 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "./comps/Navbar";
 import "./globals.css";
 
-import {
-  ClerkProvider,
-
-  SignedOut,
-
-} from "@clerk/nextjs";
+import { ClerkProvider, SignedOut } from "@clerk/nextjs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Raktbeej",
   description: "A De-sci project",
-    icons: {
+  icons: {
     icon: "/favicon.ico",
   },
 };
@@ -41,18 +36,14 @@ export default function RootLayout({
         >
           <header>
             <div className="text-slate-50">
-             <Navbar />
-            <SignedOut>
-              {/*  <SignInButton />
+              <Navbar />
+              <SignedOut>
+                {/*  <SignInButton />
               <SignUpButton /> */}
-            </SignedOut>
-    
-  
+              </SignedOut>
             </div>
           </header>
-<div className="text-slate-50">
-          {children}
-          </div>
+          <div className="text-slate-50">{children}</div>
         </body>
       </html>
     </ClerkProvider>
