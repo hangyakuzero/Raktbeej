@@ -56,8 +56,13 @@ export default function Navbar() {
             </SignedIn>
           </ul>
         </div>
+<<<<<<< HEAD
         <a className={`btn btn-ghost text-2xl ${inter.className}`} href="/">
           RAKTBEEJ 🩸
+=======
+        <a className={`flex whitespace-nowrap items-center text-2xl ${inter.className}`} href="/">
+          RAKTBEEJ🩸
+>>>>>>> 7f55b64ba9e092b0d6c60286d5d0ebc9af33e3ef
         </a>
       </div>
 
@@ -90,6 +95,23 @@ export default function Navbar() {
             Upload
           </Link>
         </SignedIn>
+<<<<<<< HEAD
+=======
+<SignedOut>
+  <div className="flex items-center gap-2">
+    <div className="px-2.5 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition">
+      <SignInButton />
+    </div>
+    <div className="px-2.5 py-1.5 text-sm font-medium text-black bg-gray-100 rounded-md hover:bg-black hover:text-white transition">
+      <SignUpButton />
+    </div>
+  </div>
+</SignedOut>
+
+
+
+ 
+>>>>>>> 7f55b64ba9e092b0d6c60286d5d0ebc9af33e3ef
 
         <SignedOut>
           <SignInButton
